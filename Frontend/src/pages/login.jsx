@@ -1,22 +1,25 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState,useEffect, useContext } from "react";
 import { toast } from "react-toastify";
-import { LoginContext } from "../Component/context";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { updateLogin } from "../feature/statemanagement";
 
 export default function Login() {
-
   const [formdata, setformdata] = useState({
     email: "",
     password: "",
   });
-  const navigate = useNavigate()
+  const login = useSelector((state) => state.dataSlice.login);
+  console.log(login);
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setformdata({ ...formdata, [e.target.name]: e.target.value });
   };
 
-  
   async function handlesubmit(e) {
     e.preventDefault();
     if (formdata.email != "" && formdata.password != "") {
@@ -26,56 +29,61 @@ export default function Login() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials : "include",
+          credentials: "include",
           body: JSON.stringify({ formdata }),
         });
 
-        const data = await response.json()
+        const data = await response.json();
         console.log(data);
-        if (data.success) { 
-          toast("login success")
+        if (data.success) {
+          toast("login success");
           const deley = new Promise((resolve, reject) => {
             setTimeout(() => {
-              resolve()
-            },2000)
-          })
-          navigate("/home")
+              resolve();
+            }, 2000);
+          });
+          navigate("/home");
         }
-
       } catch (error) {
-        console.log("error :",error)
+        console.log("error :", error);
       }
-      
     } else {
       toast("fill the form first", {
         rtl: true,
         progress: 5000,
-        position :"top-center"
-      })
+        position: "top-center",
+      });
     }
   }
 
   useEffect(() => {
-    (async function islogin() {
+    async function islogin() {
       const res = await axios("http://localhost:8000/users/authentication", {
-        method : "post",
+        method: "post",
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials : true,
-        data : JSON.stringify(),
+        withCredentials: true,
       });
-      const data = await res.json();
+      const data = res.data;
       console.log(data);
       if (data.success) {
         navigate("/home");
       }
-    })();
+    }
+    islogin();
   }, []);
 
   return (
     <div className="w-full m-auto pt-28 Loginform h-[calc(100vh-60px)] flex flex-col items-center gap-2 p-3 text-lg font-mono bg-slate-50 ">
-      <h1 className="font-semibold text-2xl ">Login </h1>
+      <h1
+        className="font-semibold text-2xl "
+        onClick={() => {
+          dispatch(updateLogin());
+        }}
+      >
+        Login {login}{" "}
+      </h1>
       <form className="flex flex-col gap-2 w-80">
         <div className="flex flex-col">
           <label htmlFor="email" className="font-medium">
