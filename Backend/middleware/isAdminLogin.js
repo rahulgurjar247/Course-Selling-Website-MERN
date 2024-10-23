@@ -21,7 +21,7 @@ async function isAdminLogin(req, res) {
     });
   } else {
     res.json({
-      msg: "Bro you are noy login",
+      msg: "Bro you are not logged in",
       success: false,
     });
   }
